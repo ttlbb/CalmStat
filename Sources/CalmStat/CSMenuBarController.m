@@ -186,7 +186,8 @@ typedef NS_ENUM(NSInteger, CSDisplayTag) {
     CSSystemSnapshot *snapshot = [self.monitor sample];
     self.latestSnapshot = snapshot;
     [self.networkPanel updateDownloadRate:snapshot.downloadBytesPerSecond
-                               uploadRate:snapshot.uploadBytesPerSecond];
+                               uploadRate:snapshot.uploadBytesPerSecond
+                                usingSwap:snapshot.swapUsed > 0];
     [self updateFloatingPanelVisibility];
     [self updateStatusTitleWithSnapshot:snapshot];
     [self updateDetailsWithSnapshot:snapshot];

@@ -16,8 +16,21 @@ static NSString *const CSFloatingPanelYKey = @"floatingNetworkPanelY";
 
 @end
 
+@interface CSPassthroughTintView : NSView
+@end
+
+@implementation CSPassthroughTintView
+
+- (nullable NSView *)hitTest:(NSPoint)point {
+    (void)point;
+    return nil;
+}
+
+@end
+
 @interface CSNetworkFloatingPanel () <NSWindowDelegate>
 
+@property(nonatomic, strong) NSView *tintView;
 @property(nonatomic, strong) NSTextField *downloadLabel;
 @property(nonatomic, strong) NSTextField *uploadLabel;
 
@@ -71,6 +84,13 @@ static NSString *const CSFloatingPanelYKey = @"floatingNetworkPanelY";
     background.layer.masksToBounds = YES;
     self.contentView = background;
 
+    self.tintView = [[CSPassthroughTintView alloc] init];
+    self.tintView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.tintView.wantsLayer = YES;
+    self.tintView.layer.cornerRadius = 9;
+    self.tintView.layer.backgroundColor = NSColor.clearColor.CGColor;
+    [background addSubview:self.tintView];
+
     self.downloadLabel = [self rateLabelWithPrefix:@"↓"];
     self.uploadLabel = [self rateLabelWithPrefix:@"↑"];
 
@@ -86,6 +106,10 @@ static NSString *const CSFloatingPanelYKey = @"floatingNetworkPanelY";
     [background addSubview:stack];
 
     [NSLayoutConstraint activateConstraints:@[
+        [self.tintView.leadingAnchor constraintEqualToAnchor:background.leadingAnchor],
+        [self.tintView.trailingAnchor constraintEqualToAnchor:background.trailingAnchor],
+        [self.tintView.topAnchor constraintEqualToAnchor:background.topAnchor],
+        [self.tintView.bottomAnchor constraintEqualToAnchor:background.bottomAnchor],
         [stack.leadingAnchor constraintEqualToAnchor:background.leadingAnchor constant:10],
         [stack.trailingAnchor constraintEqualToAnchor:background.trailingAnchor constant:-10],
         [stack.centerYAnchor constraintEqualToAnchor:background.centerYAnchor],
@@ -128,11 +152,21 @@ static NSString *const CSFloatingPanelYKey = @"floatingNetworkPanelY";
     }
 }
 
-- (void)updateDownloadRate:(double)downloadRate uploadRate:(double)uploadRate {
+- (void)updateDownloadRate:(double)downloadRate
+                uploadRate:(double)uploadRate
+                 usingSwap:(BOOL)usingSwap {
     self.downloadLabel.stringValue =
         [NSString stringWithFormat:@"↓ %@", CSFormatRate(downloadRate)];
     self.uploadLabel.stringValue =
         [NSString stringWithFormat:@"↑ %@", CSFormatRate(uploadRate)];
+    [self updateTintForSwapState:usingSwap];
+}
+
+- (void)updateTintForSwapState:(BOOL)usingSwap {
+    NSColor *tintColor = usingSwap
+        ? [NSColor.systemRedColor colorWithAlphaComponent:0.48]
+        : [NSColor.secondaryLabelColor colorWithAlphaComponent:0.08];
+    self.tintView.layer.backgroundColor = tintColor.CGColor;
 }
 
 - (void)showPanel {

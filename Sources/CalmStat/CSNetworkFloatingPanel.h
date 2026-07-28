@@ -4,7 +4,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CSNetworkFloatingPanel : NSPanel
 
-- (void)updateDownloadRate:(double)downloadRate uploadRate:(double)uploadRate;
+- (void)updateDownloadRate:(double)downloadRate
+                uploadRate:(double)uploadRate
+                 usingSwap:(BOOL)usingSwap;
 - (void)showPanel;
 - (void)hidePanel;
 
