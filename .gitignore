@@ -1,0 +1,5 @@
+.build/
+dist/
+.DS_Store
+support/AppIcon/CalmStat-icon-transparent.png
+support/AppIcon/CalmStat.iconset/
